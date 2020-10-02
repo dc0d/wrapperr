@@ -20,14 +20,14 @@ func Mark(err error) error {
 		fnName = fn.Name()
 	}
 
-	loc := Loc{
+	loc := cloc{
 		Line: line,
 		File: path.Base(file),
 		Func: path.Base(fnName),
 	}
 
 	mkerr := MarkerError{
-		Calls: []Loc{loc},
+		Calls: []cloc{loc},
 		Cause: err,
 	}
 	mkerr.flatten()
@@ -36,7 +36,7 @@ func Mark(err error) error {
 }
 
 type MarkerError struct {
-	Calls Calls
+	Calls calls
 	Cause error
 }
 
@@ -50,7 +50,7 @@ func (m MarkerError) Unwrap() error {
 
 func (m MarkerError) MarshalJSON() ([]byte, error) {
 	var payload struct {
-		Calls Calls
+		Calls calls
 		Cause interface{}
 	}
 
@@ -81,9 +81,9 @@ func (m *MarkerError) flatten() {
 	m.Cause = down.Unwrap()
 }
 
-type Calls []Loc
+type calls []cloc
 
-func (c Calls) String() string {
+func (c calls) String() string {
 	var calls []string
 	for _, call := range c {
 		calls = append(calls, call.String())
@@ -91,16 +91,16 @@ func (c Calls) String() string {
 	return strings.Join(calls, "\n")
 }
 
-type Loc struct {
+type cloc struct {
 	Line int
 	File string
 	Func string
 }
 
-func (loc Loc) String() string {
+func (loc cloc) String() string {
 	return fmt.Sprintf("[%v:%v %v]", loc.File, loc.Line, loc.Func)
 }
 
-func (loc Loc) MarshalJSON() ([]byte, error) {
+func (loc cloc) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + loc.String() + `"`), nil
 }

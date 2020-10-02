@@ -1,3 +1,5 @@
+[![GoDoc](https://godoc.org/github.com/dc0d/caseconv?status.svg)](https://pkg.go.dev/github.com/dc0d/here)
+
 # here
 
 Some Go modules/packages that help with instrumenting code with logging, can be configured in a way to enhance the log entry with the information about _where the logging happens_ inside the code.
