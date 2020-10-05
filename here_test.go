@@ -188,6 +188,70 @@ func TestMark_json_sentinel(t *testing.T) {
 	assert.Equal(expectedJSON, jsonStr)
 }
 
+func TestHere_get_call_location(t *testing.T) {
+	var (
+		assert = assert.New(t)
+
+		expectedLine            = 29
+		expectedFilePathSegment = "here/here_call_fixture_test.go"
+		expectedFunc            = "github.com/dc0d/here_test.whereIsThisPlace"
+	)
+
+	actualLocation := whereIsThisPlace()
+
+	assert.Equal(expectedLine, actualLocation.Line)
+	assert.Contains(actualLocation.File, expectedFilePathSegment)
+	assert.Equal(actualLocation.Func, expectedFunc)
+}
+
+func TestHere_get_call_location_in_upper_caller(t *testing.T) {
+	var (
+		assert = assert.New(t)
+
+		expectedLine            = 37
+		expectedFilePathSegment = "here/here_call_fixture_test.go"
+		expectedFunc            = "github.com/dc0d/here_test.theCaller"
+	)
+
+	actualLocation := theCaller()
+
+	assert.Equal(expectedLine, actualLocation.Line)
+	assert.Contains(actualLocation.File, expectedFilePathSegment)
+	assert.Equal(actualLocation.Func, expectedFunc)
+}
+
+func TestHere_get_call_location_less_than_one_skip_is_ignored(t *testing.T) {
+	var (
+		assert = assert.New(t)
+
+		expectedLine            = 41
+		expectedFilePathSegment = "here/here_call_fixture_test.go"
+		expectedFunc            = "github.com/dc0d/here_test.lessThanOneSkipIsIgnored"
+	)
+
+	actualLocation := lessThanOneSkipIsIgnored()
+
+	assert.Equal(expectedLine, actualLocation.Line)
+	assert.Contains(actualLocation.File, expectedFilePathSegment)
+	assert.Equal(actualLocation.Func, expectedFunc)
+}
+
+func TestHere_get_call_location_short_names(t *testing.T) {
+	var (
+		assert = assert.New(t)
+
+		expectedLine            = 45
+		expectedFilePathSegment = "here_call_fixture_test.go"
+		expectedFunc            = "here_test.inShortWhereIsThisPlace"
+	)
+
+	actualLocation := inShortWhereIsThisPlace()
+
+	assert.Equal(expectedLine, actualLocation.Line)
+	assert.Equal(expectedFilePathSegment, actualLocation.File)
+	assert.Equal(actualLocation.Func, expectedFunc)
+}
+
 var (
 	rootCause = errors.New("ROOT CAUSE ERROR")
 )
@@ -195,5 +259,3 @@ var (
 type sentinelErr string
 
 func (s sentinelErr) Error() string { return string(s) }
-
-// ?: recursive
