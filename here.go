@@ -9,22 +9,9 @@ import (
 )
 
 func Mark(err error) error {
-	pc, file, line, ok := runtime.Caller(1)
-	if !ok {
-		return err
-	}
+	lc := Here(WithSkip(2), WithShortNames())
 
-	fnName := "N/A"
-	fn := runtime.FuncForPC(pc)
-	if fn != nil {
-		fnName = fn.Name()
-	}
-
-	loc := cloc{
-		Line: line,
-		File: path.Base(file),
-		Func: path.Base(fnName),
-	}
+	loc := cloc(lc)
 
 	mkerr := MarkerError{
 		Calls: []cloc{loc},
@@ -104,3 +91,97 @@ func (loc cloc) String() string {
 func (loc cloc) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + loc.String() + `"`), nil
 }
+
+// Here returns the location of a call, inside a caller function or a caller of the caller function and so on.
+// The minimum number of skips is 1 (the direct caller of Here function).
+func Here(options ...hereOption) (result Loc) {
+	fnName := NotAvailableFuncName
+	result.Func = fnName
+
+	opt := newHereOptions()
+	for _, op := range options {
+		if op == nil {
+			continue
+		}
+		opt = op(opt)
+	}
+
+	pc, file, line, ok := runtime.Caller(opt.skip)
+	if !ok {
+		return
+	}
+
+	fn := runtime.FuncForPC(pc)
+	if fn != nil {
+		fnName = fn.Name()
+
+		if opt.shortFunc {
+			fnName = path.Base(fnName)
+		}
+	}
+
+	if opt.shortFile {
+		file = path.Base(file)
+	}
+
+	result.File = file
+	result.Line = line
+	result.Func = fnName
+
+	return
+}
+
+func WithSkip(skip int) hereOption {
+	return func(opt hereOptions) hereOptions {
+		if skip < 1 {
+			return opt
+		}
+
+		opt.skip = skip
+
+		return opt
+	}
+}
+
+func WithShortNames() hereOption {
+	return func(opt hereOptions) hereOptions {
+		opt.shortFunc = true
+		opt.shortFile = true
+
+		return opt
+	}
+}
+
+func WithShortFunc() hereOption {
+	return func(opt hereOptions) hereOptions {
+		opt.shortFunc = true
+
+		return opt
+	}
+}
+
+func WithShortFile() hereOption {
+	return func(opt hereOptions) hereOptions {
+		opt.shortFile = true
+
+		return opt
+	}
+}
+
+type hereOption func(hereOptions) hereOptions
+
+type hereOptions struct {
+	skip      int
+	shortFunc bool
+	shortFile bool
+}
+
+func newHereOptions() hereOptions {
+	return hereOptions{
+		skip: 1,
+	}
+}
+
+type Loc cloc
+
+const NotAvailableFuncName = "NOT_AVAILABLE"

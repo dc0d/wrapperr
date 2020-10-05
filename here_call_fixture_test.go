@@ -24,3 +24,23 @@ func callAnonymousFunc() error {
 	fn := func() error { return here.Mark(rootCause) }
 	return here.Mark(fn())
 }
+
+func whereIsThisPlace() here.Loc {
+	return here.Here()
+}
+
+func returnTheCaller() here.Loc {
+	return here.Here(here.WithSkip(2))
+}
+
+func theCaller() here.Loc {
+	return returnTheCaller()
+}
+
+func lessThanOneSkipIsIgnored() here.Loc {
+	return here.Here(here.WithSkip(0))
+}
+
+func inShortWhereIsThisPlace() here.Loc {
+	return here.Here(here.WithShortFile(), here.WithShortFunc())
+}
