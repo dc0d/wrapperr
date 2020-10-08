@@ -4,43 +4,51 @@ import (
 	"github.com/dc0d/here"
 )
 
-func firstFn() error {
-	return here.Mark(rootCause)
+func fn1() here.Calls {
+	return here.Mark()
 }
 
-func anotherFn() error {
-	return here.Mark(rootCause)
-}
+// import (
+// 	"github.com/dc0d/here"
+// )
 
-func secondFn() error {
-	return here.Mark(firstFn())
-}
+// func firstFn() error {
+// 	return here.Mark(rootCause)
+// }
 
-func thirdFn() error {
-	return here.Mark(secondFn())
-}
+// func anotherFn() error {
+// 	return here.Mark(rootCause)
+// }
 
-func callAnonymousFunc() error {
-	fn := func() error { return here.Mark(rootCause) }
-	return here.Mark(fn())
-}
+// func secondFn() error {
+// 	return here.Mark(firstFn())
+// }
 
-func whereIsThisPlace() here.Loc {
-	return here.Here()
-}
+// func thirdFn() error {
+// 	return here.Mark(secondFn())
+// }
 
-func returnTheCaller() here.Loc {
-	return here.Here(here.WithSkip(2))
-}
+// func callAnonymousFunc() error {
+// 	fn := func() error { return here.Mark(rootCause) }
+// 	return here.Mark(fn())
+// }
 
-func theCaller() here.Loc {
-	return returnTheCaller()
-}
+// func whereIsThisPlace() here.Loc {
+// 	return here.Here()
+// }
 
-func lessThanOneSkipIsIgnored() here.Loc {
-	return here.Here(here.WithSkip(0))
-}
+// func returnTheCaller() here.Loc {
+// 	return here.Here(here.WithSkip(2))
+// }
 
-func inShortWhereIsThisPlace() here.Loc {
-	return here.Here(here.WithShortFile(), here.WithShortFunc())
-}
+// func theCaller() here.Loc {
+// 	return returnTheCaller()
+// }
+
+// func lessThanOneSkipIsIgnored() here.Loc {
+// 	return here.Here(here.WithSkip(0))
+// }
+
+// func inShortWhereIsThisPlace() here.Loc {
+// 	return here.Here(here.WithShortFile(), here.WithShortFunc())
+// }
