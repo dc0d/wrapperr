@@ -2,260 +2,111 @@ package here_test
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"testing"
+
+	"github.com/dc0d/here"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMark_first(t *testing.T) {
-	var (
-		assert        = assert.New(t)
-		expectedError string
-	)
+func TestLoc(t *testing.T) {
+	t.Run("string", func(t *testing.T) {
+		var (
+			assert         = assert.New(t)
+			loc            here.Loc
+			expectedString string
+			actualString   string
+		)
 
-	{
-		expectedError = "[here_call_fixture_test.go:8 here_test.firstFn]\nROOT CAUSE ERROR"
-	}
+		{
+			loc.File = "file"
+			loc.Line = 10
+			loc.Func = "fn"
 
-	actualError := firstFn()
+			expectedString = "file:10 fn"
+		}
 
-	assert.Contains(actualError.Error(), expectedError)
+		actualString = fmt.Sprint(loc)
+
+		assert.Equal(expectedString, actualString)
+	})
+
+	t.Run("json", func(t *testing.T) {
+		var (
+			assert       = assert.New(t)
+			loc          here.Loc
+			expectedJSON string
+			actualJSON   string
+		)
+
+		{
+			loc.File = "file"
+			loc.Line = 10
+			loc.Func = "fn"
+
+			expectedJSON = `{"file":"file:10","func":"fn"}`
+		}
+
+		js, _ := json.Marshal(loc)
+		actualJSON = string(js)
+
+		assert.Equal(expectedJSON, actualJSON)
+	})
 }
 
-func TestMark_another(t *testing.T) {
-	var (
-		assert        = assert.New(t)
-		expectedError string
-	)
+func TestCalls(t *testing.T) {
+	t.Run("string", func(t *testing.T) {
+		var (
+			assert         = assert.New(t)
+			calls          here.Calls
+			expectedString string
+			actualString   string
+		)
 
-	{
-		expectedError = "[here_call_fixture_test.go:12 here_test.anotherFn]\nROOT CAUSE ERROR"
-	}
+		{
+			for i := 1; i <= 10; i++ {
+				loc := here.Loc{
+					File: fmt.Sprintf("file-%02d", i),
+					Func: fmt.Sprintf("fn%02d", i),
+					Line: i,
+				}
+				calls = append(calls, loc)
+			}
 
-	actualError := anotherFn()
+			expectedString = "file-01:1 fn01 >\nfile-02:2 fn02 >\nfile-03:3 fn03 >\nfile-04:4 fn04 >\nfile-05:5 fn05 >\nfile-06:6 fn06 >\nfile-07:7 fn07 >\nfile-08:8 fn08 >\nfile-09:9 fn09 >\nfile-10:10 fn10"
+		}
 
-	assert.Contains(actualError.Error(), expectedError)
+		actualString = fmt.Sprint(calls)
+
+		assert.Equal(expectedString, actualString)
+	})
 }
 
-func TestMark_third(t *testing.T) {
-	var (
-		assert        = assert.New(t)
-		expectedError string
-	)
+func TestMark(t *testing.T) {
+	t.Run("string", func(t *testing.T) {
+		var (
+			assert          = assert.New(t)
+			calls           here.Calls
+			expectedStrings []string
+			actualString    string
+		)
 
-	{
-		expectedError = "[here_call_fixture_test.go:20 here_test.thirdFn]\n[here_call_fixture_test.go:16 here_test.secondFn]\n[here_call_fixture_test.go:8 here_test.firstFn]\nROOT CAUSE ERROR"
-	}
+		{
+			calls = fn1()
 
-	actualError := thirdFn()
+			expectedStrings = []string{
+				"here/here_call_fixture_test.go:8",
+				"github.com/dc0d/here_test.fn1 >\n",
+				"here/here_test.go:96 github.com/dc0d/here_test.TestMark.func1 >\n",
+				"testing.tRunner",
+			}
+		}
 
-	assert.Contains(actualError.Error(), expectedError)
+		actualString = fmt.Sprint(calls)
+
+		for _, s := range expectedStrings {
+			assert.Contains(actualString, s)
+		}
+	})
 }
-
-func TestMark_anonymous_func(t *testing.T) {
-	var (
-		assert        = assert.New(t)
-		expectedError string
-	)
-
-	{
-		expectedError = "[here_call_fixture_test.go:25 here_test.callAnonymousFunc]\n[here_call_fixture_test.go:24 here_test.callAnonymousFunc.func1]\nROOT CAUSE ERROR"
-	}
-
-	actualError := callAnonymousFunc()
-
-	assert.Contains(actualError.Error(), expectedError)
-}
-
-func TestMark_first_unwrap(t *testing.T) {
-	var (
-		assert        = assert.New(t)
-		expectedError error
-	)
-
-	{
-		expectedError = rootCause
-	}
-
-	actualError := errors.Unwrap(firstFn())
-
-	assert.Equal(expectedError, actualError)
-}
-
-func TestMark_third_unwrap(t *testing.T) {
-	var (
-		assert        = assert.New(t)
-		expectedError error
-	)
-
-	{
-		expectedError = rootCause
-	}
-
-	actualError := errors.Unwrap(thirdFn())
-
-	assert.Equal(expectedError, actualError)
-}
-
-func TestMark_nil_unwrap(t *testing.T) {
-	originalRootCause := rootCause
-	defer func() { rootCause = originalRootCause }()
-	rootCause = nil
-
-	var (
-		assert        = assert.New(t)
-		expectedError error
-	)
-
-	{
-		expectedError = rootCause
-	}
-
-	actualError := errors.Unwrap(thirdFn())
-
-	assert.Equal(expectedError, actualError)
-}
-
-func TestMark_json(t *testing.T) {
-	var (
-		assert       = assert.New(t)
-		expectedJSON string
-	)
-
-	{
-		expectedJSON = "{\"Calls\":[\"[here_call_fixture_test.go:20 here_test.thirdFn]\",\"[here_call_fixture_test.go:16 here_test.secondFn]\",\"[here_call_fixture_test.go:8 here_test.firstFn]\"],\"Cause\":\"ROOT CAUSE ERROR\"}"
-	}
-
-	err := thirdFn()
-
-	js, err := json.Marshal(err)
-	if err != nil {
-		t.Fatal(err)
-	}
-	jsonStr := string(js)
-
-	assert.Equal(expectedJSON, jsonStr)
-}
-
-func TestMark_json_nil(t *testing.T) {
-	originalRootCause := rootCause
-	defer func() { rootCause = originalRootCause }()
-	rootCause = nil
-
-	var (
-		assert       = assert.New(t)
-		expectedJSON string
-	)
-
-	{
-		expectedJSON = "{\"Calls\":[\"[here_call_fixture_test.go:20 here_test.thirdFn]\",\"[here_call_fixture_test.go:16 here_test.secondFn]\",\"[here_call_fixture_test.go:8 here_test.firstFn]\"],\"Cause\":null}"
-	}
-
-	err := thirdFn()
-
-	js, err := json.Marshal(err)
-	if err != nil {
-		t.Fatal(err)
-	}
-	jsonStr := string(js)
-
-	assert.Equal(expectedJSON, jsonStr)
-}
-
-func TestMark_json_sentinel(t *testing.T) {
-	originalRootCause := rootCause
-	defer func() { rootCause = originalRootCause }()
-	rootCause = sentinelErr("ROOT CAUSE ERROR")
-
-	var (
-		assert       = assert.New(t)
-		expectedJSON string
-	)
-
-	{
-		expectedJSON = "{\"Calls\":[\"[here_call_fixture_test.go:20 here_test.thirdFn]\",\"[here_call_fixture_test.go:16 here_test.secondFn]\",\"[here_call_fixture_test.go:8 here_test.firstFn]\"],\"Cause\":\"ROOT CAUSE ERROR\"}"
-	}
-
-	err := thirdFn()
-
-	js, err := json.Marshal(err)
-	if err != nil {
-		t.Fatal(err)
-	}
-	jsonStr := string(js)
-
-	assert.Equal(expectedJSON, jsonStr)
-}
-
-func TestHere_get_call_location(t *testing.T) {
-	var (
-		assert = assert.New(t)
-
-		expectedLine            = 29
-		expectedFilePathSegment = "here/here_call_fixture_test.go"
-		expectedFunc            = "github.com/dc0d/here_test.whereIsThisPlace"
-	)
-
-	actualLocation := whereIsThisPlace()
-
-	assert.Equal(expectedLine, actualLocation.Line)
-	assert.Contains(actualLocation.File, expectedFilePathSegment)
-	assert.Equal(actualLocation.Func, expectedFunc)
-}
-
-func TestHere_get_call_location_in_upper_caller(t *testing.T) {
-	var (
-		assert = assert.New(t)
-
-		expectedLine            = 37
-		expectedFilePathSegment = "here/here_call_fixture_test.go"
-		expectedFunc            = "github.com/dc0d/here_test.theCaller"
-	)
-
-	actualLocation := theCaller()
-
-	assert.Equal(expectedLine, actualLocation.Line)
-	assert.Contains(actualLocation.File, expectedFilePathSegment)
-	assert.Equal(actualLocation.Func, expectedFunc)
-}
-
-func TestHere_get_call_location_less_than_one_skip_is_ignored(t *testing.T) {
-	var (
-		assert = assert.New(t)
-
-		expectedLine            = 41
-		expectedFilePathSegment = "here/here_call_fixture_test.go"
-		expectedFunc            = "github.com/dc0d/here_test.lessThanOneSkipIsIgnored"
-	)
-
-	actualLocation := lessThanOneSkipIsIgnored()
-
-	assert.Equal(expectedLine, actualLocation.Line)
-	assert.Contains(actualLocation.File, expectedFilePathSegment)
-	assert.Equal(actualLocation.Func, expectedFunc)
-}
-
-func TestHere_get_call_location_short_names(t *testing.T) {
-	var (
-		assert = assert.New(t)
-
-		expectedLine            = 45
-		expectedFilePathSegment = "here_call_fixture_test.go"
-		expectedFunc            = "here_test.inShortWhereIsThisPlace"
-	)
-
-	actualLocation := inShortWhereIsThisPlace()
-
-	assert.Equal(expectedLine, actualLocation.Line)
-	assert.Equal(expectedFilePathSegment, actualLocation.File)
-	assert.Equal(actualLocation.Func, expectedFunc)
-}
-
-var (
-	rootCause = errors.New("ROOT CAUSE ERROR")
-)
-
-type sentinelErr string
-
-func (s sentinelErr) Error() string { return string(s) }
