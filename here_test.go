@@ -53,6 +53,50 @@ func TestLoc(t *testing.T) {
 
 		assert.Equal(expectedJSON, actualJSON)
 	})
+
+	t.Run("shorten file", func(t *testing.T) {
+		var (
+			assert         = assert.New(t)
+			loc            here.Loc
+			expectedString string
+			actualString   string
+		)
+
+		{
+			loc.File = "/path/to/file.go"
+			loc.Line = 10
+			loc.Func = "github.com/user/mod/v6/pkg.fn"
+
+			expectedString = "file.go:10 github.com/user/mod/v6/pkg.fn"
+		}
+
+		loc.ShortenFile()
+		actualString = fmt.Sprint(loc)
+
+		assert.Equal(expectedString, actualString)
+	})
+
+	t.Run("shorten func", func(t *testing.T) {
+		var (
+			assert         = assert.New(t)
+			loc            here.Loc
+			expectedString string
+			actualString   string
+		)
+
+		{
+			loc.File = "/path/to/file.go"
+			loc.Line = 10
+			loc.Func = "github.com/user/mod/v6/pkg.fn"
+
+			expectedString = "/path/to/file.go:10 pkg.fn"
+		}
+
+		loc.ShortenFunc()
+		actualString = fmt.Sprint(loc)
+
+		assert.Equal(expectedString, actualString)
+	})
 }
 
 func TestCalls(t *testing.T) {
@@ -96,9 +140,10 @@ func TestMark(t *testing.T) {
 			calls = fn1()
 
 			expectedStrings = []string{
-				"here/here_call_fixture_test.go:8",
+				"here/here_call_fixture_test.go",
 				"github.com/dc0d/here_test.fn1 >\n",
-				"here/here_test.go:96 github.com/dc0d/here_test.TestMark.func1 >\n",
+				"here/here_test.go",
+				"github.com/dc0d/here_test.TestMark.func1 >\n",
 				"testing.tRunner",
 			}
 		}
@@ -108,5 +153,90 @@ func TestMark(t *testing.T) {
 		for _, s := range expectedStrings {
 			assert.Contains(actualString, s)
 		}
+	})
+
+	t.Run("with short files", func(t *testing.T) {
+		var (
+			assert          = assert.New(t)
+			calls           here.Calls
+			expectedStrings []string
+			actualString    string
+		)
+
+		{
+			calls = fn2()
+
+			expectedStrings = []string{
+				"here_call_fixture_test.go",
+				"github.com/dc0d/here_test.fn2 >\n",
+				"here_test.go",
+				"github.com/dc0d/here_test.TestMark.func2 >\n",
+				"testing.tRunner",
+			}
+		}
+
+		actualString = fmt.Sprint(calls)
+
+		for _, s := range expectedStrings {
+			assert.Contains(actualString, s)
+		}
+		assert.NotContains(actualString, "here/here_call_fixture_test.go")
+		assert.NotContains(actualString, "here/here_test.go")
+	})
+
+	t.Run("with short funcs", func(t *testing.T) {
+		var (
+			assert          = assert.New(t)
+			calls           here.Calls
+			expectedStrings []string
+			actualString    string
+		)
+
+		{
+			calls = fn3()
+
+			expectedStrings = []string{
+				"here_call_fixture_test.go",
+				"here_test.fn3 >\n",
+				"here_test.go",
+				"here_test.TestMark.func3 >\n",
+				"testing.tRunner",
+			}
+		}
+
+		actualString = fmt.Sprint(calls)
+
+		for _, s := range expectedStrings {
+			assert.Contains(actualString, s)
+		}
+		assert.NotContains(actualString, "github.com/dc0d/here_test.fn3")
+		assert.NotContains(actualString, "github.com/dc0d/here_test.TestMark.func3")
+	})
+
+	t.Run("with skip", func(t *testing.T) {
+		var (
+			assert          = assert.New(t)
+			calls           here.Calls
+			expectedStrings []string
+			actualString    string
+		)
+
+		{
+			calls = fn5()
+
+			expectedStrings = []string{
+				"here_call_fixture_test.go",
+				"here_test.fn5 >\n",
+				"here_test.go",
+				"testing.tRunner",
+			}
+		}
+
+		actualString = fmt.Sprint(calls)
+
+		for _, s := range expectedStrings {
+			assert.Contains(actualString, s)
+		}
+		assert.NotContains(actualString, "fn4")
 	})
 }

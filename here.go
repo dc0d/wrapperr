@@ -3,6 +3,7 @@ package here
 import (
 	"encoding/json"
 	"fmt"
+	"path"
 	"runtime"
 	"strings"
 )
@@ -25,6 +26,9 @@ func (loc Loc) MarshalJSON() ([]byte, error) {
 	return json.Marshal(payload)
 }
 
+func (loc *Loc) ShortenFile() { loc.File = path.Base(loc.File) }
+func (loc *Loc) ShortenFunc() { loc.Func = path.Base(loc.Func) }
+
 type Calls []Loc
 
 func (calls Calls) String() string {
@@ -35,10 +39,15 @@ func (calls Calls) String() string {
 	return strings.Join(lines, " >\n")
 }
 
-func Mark() (result Calls) {
+func Mark(options ...hereOption) (result Calls) {
+	var opt = newHereOptions()
+	for _, f := range options {
+		opt = f(opt)
+	}
+
 	const max = 64
 	var pfuncs [max]uintptr
-	n := runtime.Callers(2, pfuncs[:])
+	n := runtime.Callers(opt.skip, pfuncs[:])
 	calls := pfuncs[0:n]
 
 	frames := runtime.CallersFrames(calls)
@@ -56,6 +65,12 @@ func Mark() (result Calls) {
 			Line: frame.Line,
 			Func: funcName,
 		}
+		if opt.shortenFiles {
+			loc.ShortenFile()
+		}
+		if opt.shortenFuncs {
+			loc.ShortenFunc()
+		}
 		result = append(result, loc)
 	}
 
@@ -63,3 +78,41 @@ func Mark() (result Calls) {
 }
 
 const NotAvailableFuncName = "NOT_AVAILABLE"
+
+func WithShortFiles() hereOption {
+	return func(opt hereOptions) hereOptions {
+		opt.shortenFiles = true
+		return opt
+	}
+}
+
+func WithShortFuncs() hereOption {
+	return func(opt hereOptions) hereOptions {
+		opt.shortenFuncs = true
+		return opt
+	}
+}
+
+func WithSkip(skip int) hereOption {
+	return func(opt hereOptions) hereOptions {
+		if skip < 2 {
+			return opt
+		}
+
+		opt.skip = skip
+		return opt
+	}
+}
+
+type hereOption func(hereOptions) hereOptions
+
+type hereOptions struct {
+	shortenFiles bool
+	shortenFuncs bool
+	skip         int
+}
+
+func newHereOptions() (res hereOptions) {
+	res.skip = 2
+	return
+}

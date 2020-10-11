@@ -8,47 +8,18 @@ func fn1() here.Calls {
 	return here.Mark()
 }
 
-// import (
-// 	"github.com/dc0d/here"
-// )
+func fn2() here.Calls {
+	return here.Mark(here.WithShortFiles())
+}
 
-// func firstFn() error {
-// 	return here.Mark(rootCause)
-// }
+func fn3() here.Calls {
+	return here.Mark(here.WithShortFuncs())
+}
 
-// func anotherFn() error {
-// 	return here.Mark(rootCause)
-// }
+func fn4() here.Calls {
+	return here.Mark(here.WithSkip(3), here.WithSkip(-1))
+}
 
-// func secondFn() error {
-// 	return here.Mark(firstFn())
-// }
-
-// func thirdFn() error {
-// 	return here.Mark(secondFn())
-// }
-
-// func callAnonymousFunc() error {
-// 	fn := func() error { return here.Mark(rootCause) }
-// 	return here.Mark(fn())
-// }
-
-// func whereIsThisPlace() here.Loc {
-// 	return here.Here()
-// }
-
-// func returnTheCaller() here.Loc {
-// 	return here.Here(here.WithSkip(2))
-// }
-
-// func theCaller() here.Loc {
-// 	return returnTheCaller()
-// }
-
-// func lessThanOneSkipIsIgnored() here.Loc {
-// 	return here.Here(here.WithSkip(0))
-// }
-
-// func inShortWhereIsThisPlace() here.Loc {
-// 	return here.Here(here.WithShortFile(), here.WithShortFunc())
-// }
+func fn5() here.Calls {
+	return fn4()
+}
