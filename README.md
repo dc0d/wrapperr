@@ -1,4 +1,4 @@
-[![PkgGoDev](https://pkg.go.dev/badge/dc0d/wrapperr)](https://pkg.go.dev/dc0d/wrapperr)
+[![PkgGoDev](https://pkg.go.dev/badge/dc0d/wrapperr)](https://pkg.go.dev/github.com/dc0d/wrapperr@v0.4.1)
 
 # wrapperr
 
