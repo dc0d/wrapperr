@@ -14,7 +14,7 @@ func (stack Stack) String() string {
 	for _, note := range stack {
 		lines = append(lines, note.String())
 	}
-	return strings.Join(lines, " \n>> ")
+	return strings.Join(lines, "\n>> ")
 }
 
 func WithStack(err error, message ...string) error {

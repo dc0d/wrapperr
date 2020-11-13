@@ -47,7 +47,7 @@ func (suiteStack) toString(t *testing.T) {
 			},
 		}
 
-		expectedString = "file-1:1 fn1 - message-1 \n>> file-2:2 fn2 - message-2"
+		expectedString = "file-1:1 fn1 - message-1\n>> file-2:2 fn2 - message-2"
 	}
 
 	actualString := fmt.Sprint(stack)
