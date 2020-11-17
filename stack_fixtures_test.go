@@ -27,3 +27,15 @@ func fn5() error {
 func fn6() error {
 	return fn5()
 }
+
+func fn7() error {
+	return fn3()
+}
+
+func fn8() error {
+	return wrapperr.WithStack(fn7(), emptyAnnotation)
+}
+
+func fn9() error {
+	return fn8()
+}

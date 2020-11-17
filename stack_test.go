@@ -61,7 +61,8 @@ func TestWithStack(t *testing.T) {
 	t.Run(`to string`, suite.toString)
 	t.Run(`unwrap cause`, suite.unwrapCause)
 	t.Run(`with message`, suite.withMessage)
-	t.Run(`with middle message`, suite.withMiddleMessage)
+	t.Run(`with annotation`, suite.withAnnotation)
+	t.Run(`with empty annotation`, suite.withEmptyAnnotation)
 	t.Run(`to json`, suite.toJSON)
 }
 
@@ -137,7 +138,7 @@ func (suiteWithStack) withMessage(t *testing.T) {
 	}
 }
 
-func (suiteWithStack) withMiddleMessage(t *testing.T) {
+func (suiteWithStack) withAnnotation(t *testing.T) {
 	var (
 		assert = assert.New(t)
 
@@ -154,7 +155,36 @@ func (suiteWithStack) withMiddleMessage(t *testing.T) {
 			"stack_fixtures_test.go:24 github.com/dc0d/wrapperr_test.fn5 - message 5",
 			"stack_fixtures_test.go:28 github.com/dc0d/wrapperr_test.fn6",
 			"stack_test.go",
-			"github.com/dc0d/wrapperr_test.suiteWithStack.withMiddleMessage",
+			"github.com/dc0d/wrapperr_test.suiteWithStack.withAnnotation",
+			"CAUSEERR",
+		}
+	}
+
+	actualString := fmt.Sprint(err)
+
+	for _, txt := range expectedStrings {
+		assert.Contains(actualString, txt)
+	}
+}
+
+func (suiteWithStack) withEmptyAnnotation(t *testing.T) {
+	var (
+		assert = assert.New(t)
+
+		err             error
+		expectedStrings []string
+	)
+
+	{
+		err = fn9()
+
+		expectedStrings = []string{
+			"stack_fixtures_test.go:16 github.com/dc0d/wrapperr_test.fn3 - message 3",
+			"stack_fixtures_test.go:32 github.com/dc0d/wrapperr_test.fn7",
+			"stack_fixtures_test.go:36 github.com/dc0d/wrapperr_test.fn8",
+			"stack_fixtures_test.go:40 github.com/dc0d/wrapperr_test.fn9",
+			"stack_test.go",
+			"github.com/dc0d/wrapperr_test.suiteWithStack.withEmptyAnnotation",
 			"CAUSEERR",
 		}
 	}
@@ -205,4 +235,7 @@ func (suiteWithStack) toJSON(t *testing.T) {
 	}
 }
 
-var rootCause = errors.New("CAUSEERR")
+var (
+	rootCause       = errors.New("CAUSEERR")
+	emptyAnnotation = ""
+)
