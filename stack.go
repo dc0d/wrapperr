@@ -17,6 +17,12 @@ func (stack Stack) String() string {
 	return strings.Join(lines, "\n>> ")
 }
 
+// WithStack wraps the error inside another error. The original error is the root cause and
+// can be unwrapped using the standard errors.Unwrap(...) function. The wrapper error contains
+// the call stack in addition to the original error. When printed, it provides the call stack and
+// the cause in text format. If it gets marshaled as JSON, it will include the call stack
+// as a collection of calls. Each call information includes the code file path, line number
+// and the function name and package and the annotation (if provided).
 func WithStack(err error, message ...string) error {
 	switch x := err.(type) {
 	case TracedErr:
