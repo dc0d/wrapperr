@@ -3,6 +3,7 @@ package wrapperr
 import (
 	"encoding/json"
 	"fmt"
+	"path"
 	"runtime"
 	"strings"
 )
@@ -119,7 +120,7 @@ func mark(skip int) (result []Loc) {
 		}
 
 		loc := Loc{
-			File: frame.File,
+			File: shortFilePath(frame.File),
 			Line: frame.Line,
 			Func: funcName,
 		}
@@ -128,6 +129,10 @@ func mark(skip int) (result []Loc) {
 	}
 
 	return
+}
+
+func shortFilePath(fp string) string {
+	return path.Join(path.Base(path.Dir(fp)), path.Base(fp))
 }
 
 const NotAvailableFuncName = "NOT_AVAILABLE"

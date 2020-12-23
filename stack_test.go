@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"path"
 	"testing"
 
 	"github.com/dc0d/wrapperr"
@@ -58,6 +59,7 @@ func (suiteStack) toString(t *testing.T) {
 func TestWithStack(t *testing.T) {
 	var suite suiteWithStack
 
+	t.Run(`use short file path`, suite.useShortFilePath)
 	t.Run(`to string`, suite.toString)
 	t.Run(`unwrap cause`, suite.unwrapCause)
 	t.Run(`with message`, suite.withMessage)
@@ -67,6 +69,23 @@ func TestWithStack(t *testing.T) {
 }
 
 type suiteWithStack struct{}
+
+func (suiteWithStack) useShortFilePath(t *testing.T) {
+	var (
+		assert = assert.New(t)
+
+		err error
+	)
+
+	{
+		err = fn2()
+	}
+
+	actualError := err.(wrapperr.TracedErr)
+	for _, a := range actualError.Stack {
+		assert.Equal(shortFilePath(a.Loc.File), a.Loc.File)
+	}
+}
 
 func (suiteWithStack) toString(t *testing.T) {
 	var (
@@ -233,6 +252,10 @@ func (suiteWithStack) toJSON(t *testing.T) {
 	for _, txt := range expectedStrings {
 		assert.Contains(actualString, txt)
 	}
+}
+
+func shortFilePath(fp string) string {
+	return path.Join(path.Base(path.Dir(fp)), path.Base(fp))
 }
 
 var (
