@@ -1,15 +1,35 @@
-[![PkgGoDev](https://pkg.go.dev/badge/dc0d/wrapperr)](https://pkg.go.dev/github.com/dc0d/wrapperr)
+[![PkgGoDev](https://pkg.go.dev/badge/dc0d/wrapperr)](https://pkg.go.dev/github.com/dc0d/wrapperr) [![Go Report Card](https://goreportcard.com/badge/github.com/dc0d/wrapperr)](https://goreportcard.com/report/github.com/dc0d/wrapperr) [![Maintainability](https://api.codeclimate.com/v1/badges/c0fdd128cafcb6ce0c52/maintainability)](https://codeclimate.com/github/dc0d/wrapperr/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/c0fdd128cafcb6ce0c52/test_coverage)](https://codeclimate.com/github/dc0d/wrapperr/test_coverage)
 
 # wrapperr
 
-> a pick at _where the logging happens_ vs _where the error happened_ in Go
+_Where_ did that error happen down the call chain?
 
-Many Go modules for logging provide the option to log where the methods of the logger are called. For example the `logger.Error(someError)` could be called inside a file named _service.go_, from a function named `gitrepo.com/user/module/service-pkg/Connect(...)`.
+> Right at the bottom!
 
-That's useful information.
+<div align="center">
+<img src="./images/github_com_dc0d_wrapperr.png" width="80%" alt="https://github.com/dc0d/wrapperr">
+</div>
 
-But **where** the actual error - `someError` - is coming from?
+<br />
 
-This library provides a utility for enhancing the error with information about the call stack. Which is very helpful especially while working on legacy code-bases.
+All you need to do is, instead of:
 
-Also the root cause error can be accessed using the standard `errors.Unwrap(error)` function at any step.
+```go
+return nil, err
+```
+
+Do:
+
+```go
+return nil, wrapperr.WithStack(err)
+```
+
+Also, it is possible to annotate the stack in the middle:
+
+<div align="center">
+<img src="./images/github_com_dc0d_wrapperr_annotate.png" width="80%" alt="https://github.com/dc0d/wrapperr">
+</div>
+
+<br />
+
+And to get the original error, just used the standard `errors.Unwrap(error)` function from built-in `errors` package.
