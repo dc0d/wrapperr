@@ -1,7 +1,6 @@
 package wrapperr
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -14,11 +13,5 @@ type Loc struct {
 func (loc Loc) String() string { return fmt.Sprintf(loc.File+":%d "+loc.Func, loc.Line) }
 
 func (loc Loc) MarshalJSON() ([]byte, error) {
-	var payload struct {
-		File string `json:"file,omitempty"`
-		Func string `json:"func,omitempty"`
-	}
-	payload.File = fmt.Sprintf(loc.File+":%d", loc.Line)
-	payload.Func = loc.Func
-	return json.Marshal(payload)
+	return []byte(`"` + loc.String() + `"`), nil
 }

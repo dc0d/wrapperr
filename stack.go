@@ -28,7 +28,7 @@ func WithStack(err error, message ...string) error {
 	switch x := err.(type) {
 	case TracedErr:
 		if len(message) > 0 {
-			calls := mark(3)
+			calls := mark(defaultCallerStackSkip)
 
 			for i, note := range x.Stack {
 				if note.Loc == calls[0] {
@@ -42,7 +42,7 @@ func WithStack(err error, message ...string) error {
 	default:
 	}
 
-	calls := mark(3)
+	calls := mark(defaultCallerStackSkip)
 
 	stack := make(Stack, len(calls))
 	for i, call := range calls {
@@ -97,18 +97,18 @@ func (terr TracedErr) MarshalJSON() ([]byte, error) {
 	return json.Marshal(payload)
 }
 
-func mark(skip int) (result []Loc) {
-	const max = 64
-	var pfuncs [max]uintptr
+func mark(skip int) []Loc {
+	var pfuncs [maxCallerDepth]uintptr
 	n := runtime.Callers(skip, pfuncs[:])
 
 	var calls []uintptr
-	if n < 64 {
+	if n < maxCallerDepth {
 		calls = pfuncs[0:n]
 	} else {
 		calls = pfuncs[:]
 	}
 
+	var result []Loc
 	frames := runtime.CallersFrames(calls)
 	for frame, ok := frames.Next(); ok; frame, ok = frames.Next() {
 		var funcName string
@@ -128,11 +128,18 @@ func mark(skip int) (result []Loc) {
 		result = append(result, loc)
 	}
 
-	return
+	return result
 }
 
 func shortFilePath(fp string) string {
 	return path.Join(path.Base(path.Dir(fp)), path.Base(fp))
 }
 
-const NotAvailableFuncName = "NOT_AVAILABLE"
+const (
+	NotAvailableFuncName = "NOT_AVAILABLE"
+)
+
+const (
+	maxCallerDepth         = 64
+	defaultCallerStackSkip = 3
+)

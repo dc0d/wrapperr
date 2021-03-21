@@ -5,61 +5,32 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dc0d/wrapperr"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestLoc(t *testing.T) {
-	var suite suiteLoc
-
-	t.Run(`to string`, suite.toString)
-	t.Run(`to json`, suite.toJSON)
-}
-
-type suiteLoc struct{}
-
-func (suiteLoc) toString(t *testing.T) {
+func TestLoc_to_string(t *testing.T) {
 	var (
-		assert = assert.New(t)
-
-		loc            wrapperr.Loc
-		expectedString string
-	)
-
-	{
-		loc.File = "file"
-		loc.Line = 10
-		loc.Func = "fn"
-
+		loc            = sampleLoc()
 		expectedString = "file:10 fn"
-	}
+	)
 
 	actualString := fmt.Sprint(loc)
 
-	assert.Equal(expectedString, actualString)
+	assert.Equal(t, expectedString, actualString)
 }
 
-func (suiteLoc) toJSON(t *testing.T) {
+func TestLoc_to_json(t *testing.T) {
 	var (
-		assert = assert.New(t)
-
-		loc          wrapperr.Loc
-		expectedJSON string
+		loc          = sampleLoc()
+		expectedJSON = `"file:10 fn"`
 	)
 
-	{
-		loc.File = "file"
-		loc.Line = 10
-		loc.Func = "fn"
-
-		expectedJSON = `{"file":"file:10","func":"fn"}`
+	js, err := json.Marshal(loc)
+	if err != nil {
+		require.NoError(t, err)
 	}
-
-	js, _ := json.Marshal(loc)
 	actualJSON := string(js)
 
-	assert.Equal(expectedJSON, actualJSON)
+	assert.Equal(t, expectedJSON, actualJSON)
 }
-
-//
