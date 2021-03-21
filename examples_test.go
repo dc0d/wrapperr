@@ -19,10 +19,8 @@ func show(err error) {
 	var stack wrapperr.Stack
 	for _, v := range terr.Stack {
 		if !strings.Contains(v.Loc.Func, "wrapperr") {
-			v.Loc.Line = 0
-			v.Loc.File = "..."
-			v.Loc.Func = "..."
-			v.Message = "rest of stack"
+			v := v
+			buildDefaultAnnotation(&v)
 			stack = append(stack, v)
 			break
 		}
@@ -44,10 +42,8 @@ func showJSON(err error) {
 	var stack wrapperr.Stack
 	for _, v := range terr.Stack {
 		if !strings.Contains(v.Loc.Func, "wrapperr") {
-			v.Loc.Line = 0
-			v.Loc.File = "..."
-			v.Loc.Func = "..."
-			v.Message = "rest of stack"
+			v := v
+			buildDefaultAnnotation(&v)
 			stack = append(stack, v)
 			break
 		}
@@ -62,4 +58,15 @@ func showJSON(err error) {
 	}
 
 	fmt.Println(string(js))
+}
+
+func buildDefaultAnnotation(note *wrapperr.Annotation) {
+	const (
+		rest = "..."
+	)
+
+	note.Loc.Line = 0
+	note.Loc.File = rest
+	note.Loc.Func = rest
+	note.Message = "rest of stack"
 }

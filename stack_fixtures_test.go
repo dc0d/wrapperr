@@ -5,7 +5,7 @@ import (
 )
 
 func fn1() error {
-	return wrapperr.WithStack(rootCause)
+	return wrapperr.WithStack(errRootCause)
 }
 
 func fn2() error {
@@ -13,7 +13,7 @@ func fn2() error {
 }
 
 func fn3() error {
-	return wrapperr.WithStack(rootCause, "message 3")
+	return wrapperr.WithStack(errRootCause, "message 3")
 }
 
 func fn4() error {

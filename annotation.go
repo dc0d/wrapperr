@@ -1,8 +1,8 @@
 package wrapperr
 
 type Annotation struct {
-	Loc     Loc    `json:"loc"`
-	Message string `json:"message,omitempty"`
+	Loc     Loc
+	Message string
 }
 
 func (note Annotation) String() string {
@@ -11,4 +11,8 @@ func (note Annotation) String() string {
 		rest = " - " + note.Message
 	}
 	return note.Loc.String() + rest
+}
+
+func (note Annotation) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + note.String() + `"`), nil
 }

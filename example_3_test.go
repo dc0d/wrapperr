@@ -25,38 +25,11 @@ func ExampleWithStack_toJSON() {
 	// Output:
 	// {
 	//   "stack": [
-	//     {
-	//       "loc": {
-	//         "file": ".../example_3_test.go:10",
-	//         "func": "github.com/dc0d/wrapperr_test.end3"
-	//       }
-	//     },
-	//     {
-	//       "loc": {
-	//         "file": ".../example_3_test.go:14",
-	//         "func": "github.com/dc0d/wrapperr_test.caller3"
-	//       },
-	//       "message": "some notes on the call stack"
-	//     },
-	//     {
-	//       "loc": {
-	//         "file": ".../example_3_test.go:18",
-	//         "func": "github.com/dc0d/wrapperr_test.begin3"
-	//       }
-	//     },
-	//     {
-	//       "loc": {
-	//         "file": ".../example_3_test.go:22",
-	//         "func": "github.com/dc0d/wrapperr_test.ExampleWithStack_toJSON"
-	//       }
-	//     },
-	//     {
-	//       "loc": {
-	//         "file": "...:0",
-	//         "func": "..."
-	//       },
-	//       "message": "rest of stack"
-	//     }
+	//     ".../example_3_test.go:10 github.com/dc0d/wrapperr_test.end3",
+	//     ".../example_3_test.go:14 github.com/dc0d/wrapperr_test.caller3 - some notes on the call stack",
+	//     ".../example_3_test.go:18 github.com/dc0d/wrapperr_test.begin3",
+	//     ".../example_3_test.go:22 github.com/dc0d/wrapperr_test.ExampleWithStack_toJSON",
+	//     "...:0 ... - rest of stack"
 	//   ],
 	//   "cause": "OP-ERR"
 	// }
