@@ -39,3 +39,18 @@ func fn8() error {
 func fn9() error {
 	return fn8()
 }
+
+func fn10() error {
+	return wrapperr.WithStack(fn7(), message1, message2, message3)
+}
+
+func fn11() error {
+	sampleError := sampleErr{Data1: "data 1", Data2: "data 2"}
+	return wrapperr.WithStackf(sampleError, "the cause is a special error of type %T", sampleError)
+}
+
+const (
+	message1 = "message 1"
+	message2 = "message 2"
+	message3 = "message 3"
+)
