@@ -24,15 +24,30 @@ func (stack Stack) String() string {
 // the cause in text format. If it gets marshaled as JSON, it will include the call stack
 // as a collection of calls. Each call information includes the code file path, line number
 // and the function name and package and the annotation (if provided).
-func WithStack(err error, message ...string) error {
+func WithStack(err error, messages ...string) error {
+	var msg string
+	if len(messages) > 0 {
+		msg = strings.Join(messages, " ")
+	}
+
+	return makeErr(err, msg)
+}
+
+func WithStackf(err error, format string, args ...interface{}) error {
+	msg := fmt.Sprintf(format, args...)
+
+	return makeErr(err, msg)
+}
+
+func makeErr(err error, msg string) error {
 	switch x := err.(type) {
 	case TracedErr:
-		if len(message) > 0 {
+		if msg != "" {
 			calls := mark(defaultCallerStackSkip)
 
 			for i, note := range x.Stack {
 				if note.Loc == calls[0] {
-					note.Message = message[0]
+					note.Message = msg
 					x.Stack[i] = note
 					break
 				}
@@ -51,8 +66,8 @@ func WithStack(err error, message ...string) error {
 		}
 	}
 
-	if len(message) > 0 {
-		stack[0].Message = message[0]
+	if msg != "" {
+		stack[0].Message = msg
 	}
 
 	return TracedErr{
@@ -141,5 +156,5 @@ const (
 
 const (
 	maxCallerDepth         = 64
-	defaultCallerStackSkip = 3
+	defaultCallerStackSkip = 4
 )
