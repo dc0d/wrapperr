@@ -46,7 +46,7 @@ func makeErr(err error, msg string) error {
 			calls := mark(defaultCallerStackSkip)
 
 			for i, note := range x.Stack {
-				if note.Loc == calls[0] {
+				if note.Loc.Func == calls[0].Func {
 					note.Message = msg
 					x.Stack[i] = note
 					break
