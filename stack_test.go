@@ -260,6 +260,26 @@ func Test_WithStackf(t *testing.T) {
 	})
 }
 
+func Test_fix_middle_annotation(t *testing.T) {
+	t.Run(`annotated indirectly`, func(t *testing.T) {
+		errTxt := fix1().Error()
+
+		assert.Contains(t, errTxt, "annotated root cause")
+		assert.Contains(t, errTxt, "sample annotation")
+	})
+
+	t.Run(`annotated indirectly multiple times`, func(t *testing.T) {
+		errTxt := fix4().Error()
+
+		assert.Contains(t, errTxt, "annotated root cause")
+		assert.Contains(t, errTxt, "sample annotation")
+		assert.Contains(t, errTxt, "second sample annotation")
+		assert.Contains(t, errTxt, "fix2")
+		assert.Contains(t, errTxt, "fix3")
+		assert.Contains(t, errTxt, "fix4")
+	})
+}
+
 func shortFilePath(fp string) string {
 	return path.Join(path.Base(path.Dir(fp)), path.Base(fp))
 }
