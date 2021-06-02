@@ -1,8 +1,6 @@
 package makerr_test
 
 import (
-	"time"
-
 	"github.com/dc0d/wrapperr/makerr"
 )
 
@@ -17,9 +15,4 @@ func toBeCalled() string {
 
 func returnsCallerLocation() string {
 	return toBeCalled()
-}
-
-func checkScope(onEnter func(loc string), onExit func(elapsed time.Duration, loc string)) {
-	defer makerr.TraceFn(onEnter)(onExit)
-	time.Sleep(time.Millisecond * 50)
 }

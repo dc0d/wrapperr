@@ -14,7 +14,7 @@ linters-settings:
     lines: 100
     statements: 50
   gci:
-    local-prefixes: github.com/golangci/golangci-lint
+    local-prefixes: github.com/dc0d/wrapperr
   goconst:
     min-len: 2
     min-occurrences: 2
@@ -34,7 +34,7 @@ linters-settings:
   gocyclo:
     min-complexity: 15
   goimports:
-    local-prefixes: github.com/golangci/golangci-lint
+    local-prefixes: github.com/dc0d/wrapperr
   golint:
     min-confidence: 0
   gomnd:
@@ -83,7 +83,6 @@ linters:
     - gocyclo
     - gofmt
     - goimports
-    - golint
     - gomnd
     - goprintffuncname
     - gosec
@@ -121,6 +120,7 @@ linters:
   # - testpackage
   # - revive
   # - wsl
+  # - golint
 
 issues:
   # Excluding configuration per-path, per-linter, per-text and per-source
