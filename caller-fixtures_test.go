@@ -1,16 +1,16 @@
-package makerr_test
+package wrapperr_test
 
 import (
-	"github.com/dc0d/wrapperr/makerr"
+	"github.com/dc0d/wrapperr"
 )
 
 func returnsExactLocation() (result string) {
-	result = makerr.GetCaller(0)
+	result = wrapperr.GetCaller(0).String()
 	return
 }
 
 func toBeCalled() string {
-	return makerr.GetCaller(1)
+	return wrapperr.GetCaller(1).String()
 }
 
 func returnsCallerLocation() string {

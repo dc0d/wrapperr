@@ -20,7 +20,7 @@ func TestAnnotation_to_string(t *testing.T) {
 	note.Loc = sampleLoc()
 	note.Message = someMessage
 
-	expectedString = "file:10 fn - some message"
+	expectedString = "package/file.go:9 github.com/user/module/package.(*Struct).method - some message"
 
 	actualString := fmt.Sprint(note)
 
@@ -29,7 +29,7 @@ func TestAnnotation_to_string(t *testing.T) {
 
 func TestAnnotation_to_string_without_message(t *testing.T) {
 	const (
-		expectedString = "file:10 fn"
+		expectedString = "package/file.go:9 github.com/user/module/package.(*Struct).method"
 	)
 
 	var (
@@ -52,7 +52,7 @@ func TestAnnotation_to_json(t *testing.T) {
 	note.Loc = sampleLoc()
 	note.Message = someMessage
 
-	expectedJSON = `"file:10 fn - some message"`
+	expectedJSON = `"package/file.go:9 github.com/user/module/package.(*Struct).method - some message"`
 
 	js, err := json.Marshal(note)
 	if err != nil {

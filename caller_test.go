@@ -1,4 +1,4 @@
-package makerr_test
+package wrapperr_test
 
 import (
 	"testing"
@@ -11,8 +11,8 @@ func Test_GetCaller_exact(t *testing.T) {
 
 	result := returnsExactLocation()
 
-	assert.Contains(t, result, "github.com/dc0d/wrapperr/makerr_test.returnsExactLocation")
-	assert.Contains(t, result, "makerr/fixtures_test.go")
+	assert.Contains(t, result, "github.com/dc0d/wrapperr_test.returnsExactLocation")
+	assert.Contains(t, result, "wrapperr/caller-fixtures_test.go")
 	assert.Contains(t, result, ":8")
 }
 
@@ -21,7 +21,7 @@ func Test_GetCaller_caller(t *testing.T) {
 
 	result := returnsCallerLocation()
 
-	assert.Contains(t, result, "github.com/dc0d/wrapperr/makerr_test.returnsCallerLocation")
-	assert.Contains(t, result, "makerr/fixtures_test.go")
+	assert.Contains(t, result, "github.com/dc0d/wrapperr_test.returnsCallerLocation")
+	assert.Contains(t, result, "wrapperr/caller-fixtures_test.go")
 	assert.Contains(t, result, ":17")
 }

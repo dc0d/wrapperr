@@ -12,7 +12,7 @@ import (
 func TestLoc_to_string(t *testing.T) {
 	var (
 		loc            = sampleLoc()
-		expectedString = "file:10 fn"
+		expectedString = "package/file.go:9 github.com/user/module/package.(*Struct).method"
 	)
 
 	actualString := fmt.Sprint(loc)
@@ -23,7 +23,7 @@ func TestLoc_to_string(t *testing.T) {
 func TestLoc_to_json(t *testing.T) {
 	var (
 		loc          = sampleLoc()
-		expectedJSON = `"file:10 fn"`
+		expectedJSON = `"package/file.go:9 github.com/user/module/package.(*Struct).method"`
 	)
 
 	js, err := json.Marshal(loc)
