@@ -1,15 +1,15 @@
-package makerr
+package wrapperr
 
 import (
-	"path"
 	"runtime"
 )
 
-func GetCaller(skip int) string {
-	return locOf(skip + 1).String()
+// GetCaller provides information about the caller - file, line number and the function/method.
+func GetCaller(skip int) Loc {
+	return locOf(skip + 1)
 }
 
-func locOf(skip int) loc {
+func locOf(skip int) Loc {
 	if skip < 0 {
 		skip = 0
 	}
@@ -23,7 +23,7 @@ func locOf(skip int) loc {
 		name = f.Name()
 	}
 
-	var result loc
+	var result Loc
 	if ok {
 		result.File = shortFilePath(file)
 		result.Line = line
@@ -32,11 +32,3 @@ func locOf(skip int) loc {
 
 	return result
 }
-
-func shortFilePath(fp string) string {
-	return path.Join(path.Base(path.Dir(fp)), path.Base(fp))
-}
-
-const (
-	NotAvailableFuncName = "NOT_AVAILABLE"
-)

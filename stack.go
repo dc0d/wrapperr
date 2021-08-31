@@ -3,7 +3,6 @@ package wrapperr
 import (
 	"encoding/json"
 	"fmt"
-	"path"
 	"runtime"
 	"strings"
 )
@@ -144,10 +143,6 @@ func mark(skip int) []Loc {
 	}
 
 	return result
-}
-
-func shortFilePath(fp string) string {
-	return path.Join(path.Base(path.Dir(fp)), path.Base(fp))
 }
 
 const (
